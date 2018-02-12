@@ -13,7 +13,16 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
+    <profiles>
+        <profile>
+            <id>production</id>
+            <properties>
+                <app.config>/Users/fionna/IdeaProjects/AccelaTestAuto/prod.properties</app.config>
+                <env.geckodriver>/Users/fionna/IdeaProjects/geckodriver</env.geckodriver>
+                <env.screenshots>/Users/fionna/IdeaProjects/AccelaTestAuto/output/</env.screenshots>
+            </properties>
+        </profile>
+    </profiles>
   <build>
     <plugins>
       <plugin>
@@ -24,6 +33,16 @@
           <target>1.8</target>
         </configuration>
       </plugin>
+        <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+                <systemPropertyVariables>
+                    <appConfig>${app.config}</appConfig>
+                    <env.geckodriver>${env.geckodriver}</env.geckodriver>
+                    <env.screenshots>${env.screenshots}</env.screenshots>
+                </systemPropertyVariables>
+            </configuration>
+        </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -55,4 +74,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
 </project>

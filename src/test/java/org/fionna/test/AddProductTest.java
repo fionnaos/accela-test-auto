@@ -2,13 +2,16 @@ package org.fionna.test;
 
 import org.fionna.test.selenium.*;
 import org.testng.Assert;
-import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.Calendar;
+import java.util.Properties;
 
 public class AddProductTest {
 
@@ -16,19 +19,30 @@ public class AddProductTest {
     private ExperiencePage experiencePage = new ExperiencePage(BrowserDriver.getCurrentDriver());
     private BasketPage basketPage = new BasketPage(BrowserDriver.getCurrentDriver());
     private PersonalDetailsPage personalDetailsPage = new PersonalDetailsPage(BrowserDriver.getCurrentDriver());
+    private Properties properties = new Properties();
+    private final String appConfigPath = System.getProperty("appConfig");
+
+    public AddProductTest() {
+        try {
+            FileInputStream propIn = new FileInputStream(appConfigPath);
+            properties.load(new InputStreamReader(propIn, Charset.forName("UTF-8")));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test()
     public void addProductToBasketTest() {
 
-        BrowserDriver.loadPage("http://www.buyagift.co.uk");
-        mainPage.setSearchFieldText("Charming escape");
+        BrowserDriver.loadPage(properties.getProperty("url"));
+        mainPage.setSearchFieldText(properties.getProperty("searchString"));
 
         experiencePage.waitForProductForm();
-        Assert.assertEquals(experiencePage.getPageTitle(), "Charming Escape - Smartbox by Buyagift from Buyagift");
-        Assert.assertEquals(experiencePage.getExperiencePrice(), "£69.99");
+        Assert.assertEquals(experiencePage.getPageTitle(), properties.getProperty("productTitle"));
+        Assert.assertEquals(experiencePage.getExperiencePrice(), properties.getProperty("productPrice"));
 
         experiencePage.clickBuyNow();
-        Assert.assertEquals(basketPage.getBasketItemPrice(), "£69.99");
+        Assert.assertEquals(basketPage.getBasketItemPrice(), properties.getProperty("productPrice"));
 
         basketPage.addPersonalisedMessage(1, "This is a test gift");
         basketPage.selectFromDeliveryDropDown("E-voucher (Free)");
@@ -73,7 +87,8 @@ public class AddProductTest {
     @AfterMethod
     public void takeScreenshotWhenFailure(ITestResult result) {
         if (ITestResult.FAILURE == result.getStatus()) {
-            String fileAppend = "test123";
+
+            String fileAppend = String.valueOf(System.currentTimeMillis());
             mainPage.takeScreenshot(fileAppend);
         }
     }

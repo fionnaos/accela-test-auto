@@ -6,10 +6,13 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -20,6 +23,7 @@ public class BasePage {
 
     private static final Logger LOGGER = Logger.getLogger(BrowserDriver.class.getName());
     protected WebDriver driver;
+
 
     public String getPageTitle() {
         return driver.getTitle();
@@ -72,7 +76,7 @@ public class BasePage {
 
         try {
             Files.copy(scrFile.toPath(),
-                    new File("/Users/fionna/IdeaProjects/AccelaTestAuto/output/shot_" + date + ".png").toPath(),
+                    new File(System.getProperty("env.screenshots") + "/shot_" + date + ".png").toPath(),
                     (CopyOption) REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
