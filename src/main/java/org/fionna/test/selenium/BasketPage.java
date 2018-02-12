@@ -18,15 +18,15 @@ public class BasketPage extends BasePage {
     public void removeBasketItem(int index) {
         WebElement basketItem = this.getBasketItem(index);
         basketItem.findElement
-                (By.cssSelector("div > div:nth-child(1) > div.prd_details > div:nth-child(2) > span > span > a"))
+                (By.partialLinkText("x remove"))
                 .click();
-                // How robust is this selector going to be? This would be something to ask from the dev team
+            // TODO make this locator generic enough to work in different languages!
     }
 
     public void addPersonalisedMessage(int index, String message) {
         WebElement basketItem = this.getBasketItem(index);
         basketItem.findElement
-                (By.cssSelector("div > div.row.additional_details > div.basket_step > div > textarea"))
+                (By.cssSelector("div div.personalised_as_message > textarea"))
                 .sendKeys(message);
     }
 
@@ -42,7 +42,7 @@ public class BasketPage extends BasePage {
 
     private WebElement getDeliveryDropDown() {
         return this.driver.findElement
-                (By.cssSelector("#basket_summary > div > div.animate-fadeIn.ng-scope > div > div > div:nth-child(3) > span.cost_price > div.form-group.delivery_options > select"));
+                (By.cssSelector("#basket_summary div.delivery_options > select"));
     }
 
     public void selectFromDeliveryDropDown(String valueToSelect) {
@@ -51,7 +51,8 @@ public class BasketPage extends BasePage {
     }
 
     public void clickBuySecurelyNowButton() {
-        // this.driver.findElement(By.cssSelector("#basket_payment_options > a[title=\"Pay Securely Now\"]")).click(); // This brings up a popup that is tricky to get through
+        // this.driver.findElement(By.cssSelector("#basket_payment_options > a[title=\"Pay Securely Now\"]")).click();
+        // This brings up a popup that is tricky to get past, so going to just:
         BrowserDriver.loadPage("https://www.buyagift.co.uk/checkout");
     }
 

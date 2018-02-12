@@ -23,9 +23,9 @@ public class PersonalDetailsPage extends BasePage {
         waitForElement(this.driver.findElement(By.name("FirstName")));
     }
 
-    public void selectTitleFromDropdown(String index) {
+    public void selectTitleFromDropdown(String title) {
         Select dropdown = new Select(this.driver.findElement(By.id("titlefield")));
-        dropdown.selectByValue(index);
+        dropdown.selectByVisibleText(title);
     }
 
     public void setFirstName(String firstName) {
@@ -45,19 +45,19 @@ public class PersonalDetailsPage extends BasePage {
     }
 
     public void enterHouseNumber(String number) { // leaving public access for future testing
-        this.driver.findElement(By.cssSelector("#postCodeSearchBilling > div > div.form-group.housenumbersearch > div > input")).sendKeys(number);
+        this.driver.findElement(By.cssSelector("#postCodeSearchBilling div.form-group.housenumbersearch input")).sendKeys(number);
     }
 
     public void enterPostCode(String postcode) { // leaving public access for future testing
-        this.driver.findElement(By.cssSelector("#postCodeSearchBilling > div > div.form-group.postcodesearch > div > input")).sendKeys(postcode);
+        this.driver.findElement(By.cssSelector("#postCodeSearchBilling div.form-group.postcodesearch input")).sendKeys(postcode);
     }
 
     public void clickSearchButton() { // leaving public access for future testing
-        this.driver.findElement(By.cssSelector("#postCodeSearchBilling > div > div.form-group.postcodesearch > div.continue_area_buttons > button")).click();
+        this.driver.findElement(By.cssSelector("#postCodeSearchBilling div.form-group.postcodesearch > div.continue_area_buttons > button")).click();
     }
 
     public void searchAddress(String houseNumber, String postcode) {
-        WebElement houseNumberField = this.driver.findElement(By.cssSelector("#postCodeSearchBilling > div > div.form-group.housenumbersearch > div > input"));
+        WebElement houseNumberField = this.driver.findElement(By.cssSelector("#postCodeSearchBilling div.form-group.housenumbersearch input"));
         waitForElement(houseNumberField);
         this.enterHouseNumber(houseNumber);
         this.enterPostCode(postcode);
@@ -66,7 +66,7 @@ public class PersonalDetailsPage extends BasePage {
 
     public String getAddressFirstLine() {
         //WebElement addressFirstLine = this.driver.findElement(By.name("AddressLine1"));
-        WebElement addressFirstLine = this.driver.findElement(By.cssSelector("#new_card_selectaddress > ul > li.row.newcard_newaddress.subpanel-inner > div > div > div > div > div:nth-child(3) > div > input"));
+        WebElement addressFirstLine = this.driver.findElement(By.cssSelector("#new_card_selectaddress input.form-control.addressline1"));
         waitForElementAttribute(addressFirstLine, "value");
         return addressFirstLine.getAttribute("value");
     }

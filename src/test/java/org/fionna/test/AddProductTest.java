@@ -4,6 +4,7 @@ import org.fionna.test.selenium.*;
 import org.testng.Assert;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.FileInputStream;
@@ -31,12 +32,26 @@ public class AddProductTest {
         }
     }
 
-    @Test()
-    public void addProductToBasketTest() {
+    @DataProvider(name="addProductOptions")
+    public static Object[][] addProductOptions() {
 
+        return new Object[][] { { "This is a test gift", "E-voucher (Free)",
+                                    "f@f.com", "Ms.", "F", "OS", "12345",
+                                    "1A", "BT36 4PE", "Parcel Motel",
+                                    "4222222222222222", "345"}};
+
+    }
+
+    @Test(dataProvider = "addProductOptions")
+    public void addProductToBasketTest(String message, String deliveryMethod,
+                                       String email, String title, String firstName, String lastName, String phone,
+                                       String houseNumber, String postcode, String addressFirstLine,
+                                       String cardNumber, String cvv) {
+        // Load main page and search for product
         BrowserDriver.loadPage(properties.getProperty("url"));
         mainPage.setSearchFieldText(properties.getProperty("searchString"));
 
+        // Correct product is found and added to basket
         experiencePage.waitForProductForm();
         Assert.assertEquals(experiencePage.getPageTitle(), properties.getProperty("productTitle"));
         Assert.assertEquals(experiencePage.getExperiencePrice(), properties.getProperty("productPrice"));
@@ -44,35 +59,49 @@ public class AddProductTest {
         experiencePage.clickBuyNow();
         Assert.assertEquals(basketPage.getBasketItemPrice(), properties.getProperty("productPrice"));
 
-        basketPage.addPersonalisedMessage(1, "This is a test gift");
-        basketPage.selectFromDeliveryDropDown("E-voucher (Free)");
-        Assert.assertEquals(basketPage.getTotalAmount(), basketPage.getBasketItemPrice());
-        basketPage.clickBuySecurelyNowButton();
+        editBasket(message, deliveryMethod);
 
-        personalDetailsPage.continueAsGuest();
-        personalDetailsPage.enterEmailAddress("f@f.com");
-        personalDetailsPage.continueAsGuest();
+        loginAsGuest(email);
 
-        personalDetailsPage.waitForNameVisible();
-        personalDetailsPage.selectTitleFromDropdown("3");
-        personalDetailsPage.setFirstName("F");
-        personalDetailsPage.setLastName("OS");
-        personalDetailsPage.setPhoneNumber("12345");
-        personalDetailsPage.clickContinue();
+        enterName(title, firstName, lastName, phone);
 
-        // If the test is looking too verbose, methods can be combined in the page objects to create more complex test steps
-        // The disadvantage is that if the test fails, there is less information on what exactly happened
-        personalDetailsPage.searchAddress("1A", "BT36 4PE");
-        Assert.assertEquals(personalDetailsPage.getAddressFirstLine(), "Parcel Motel");
+        personalDetailsPage.searchAddress(houseNumber, postcode);
+        Assert.assertEquals(personalDetailsPage.getAddressFirstLine(), addressFirstLine);
 
-        personalDetailsPage.setCreditCardName("F OS");
-        personalDetailsPage.setCreditCardNumber("4222222222222222");
-        setCardExpiryToNextYear();
-        personalDetailsPage.setCVVNumber("345");
+        enterCreditCardDetails(firstName, lastName, cardNumber, cvv);
 
         personalDetailsPage.clickPlaceOrderButton();
         Assert.assertEquals(personalDetailsPage.getErrorMessages(), "The card number is not valid, please check the details and try again.");
 
+    }
+
+    private void enterCreditCardDetails(String firstName, String lastName, String cardNumber, String cvv) {
+        personalDetailsPage.setCreditCardName(firstName + " " + lastName);
+        personalDetailsPage.setCreditCardNumber(cardNumber);
+        setCardExpiryToNextYear();
+        personalDetailsPage.setCVVNumber(cvv);
+    }
+
+    private void enterName(String title, String firstName, String lastName, String phone) {
+        personalDetailsPage.waitForNameVisible();
+        personalDetailsPage.selectTitleFromDropdown(title);
+        personalDetailsPage.setFirstName(firstName);
+        personalDetailsPage.setLastName(lastName);
+        personalDetailsPage.setPhoneNumber(phone);
+        personalDetailsPage.clickContinue();
+    }
+
+    private void loginAsGuest(String email) {
+        personalDetailsPage.continueAsGuest();
+        personalDetailsPage.enterEmailAddress(email);
+        personalDetailsPage.continueAsGuest();
+    }
+
+    private void editBasket(String message, String deliveryMethod) {
+        basketPage.addPersonalisedMessage(1, message);
+        basketPage.selectFromDeliveryDropDown(deliveryMethod);
+        Assert.assertEquals(basketPage.getTotalAmount(), basketPage.getBasketItemPrice());
+        basketPage.clickBuySecurelyNowButton();
     }
 
     private void setCardExpiryToNextYear() {
@@ -87,7 +116,6 @@ public class AddProductTest {
     @AfterMethod
     public void takeScreenshotWhenFailure(ITestResult result) {
         if (ITestResult.FAILURE == result.getStatus()) {
-
             String fileAppend = String.valueOf(System.currentTimeMillis());
             mainPage.takeScreenshot(fileAppend);
         }

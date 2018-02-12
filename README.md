@@ -1,7 +1,11 @@
 # accela-test-auto
 ### Test Automation Challenge for Accela
 
-This is my first time working with TestNG, so I'm unaware of common usage patterns and best practices beyond what Google has told me.
+Using Selenium Page Object Model and TestNG. This is my first time working with TestNG, so I'm unaware of common usage patterns and best practices beyond what Google has told me.
+
+The test has been automated with an eye on future testing - methods in the Page Objects usually take Strings, for testing invalid values in input fields. There are also methods in MainPage and CategoryPage for automating by selecting products in particular locations instead of searching for them by name - they aren't used anywhere. 
+
+Page Objects are not fully populated.
 
 #### Executing tests
 
@@ -21,5 +25,5 @@ Data used in the test is spread across three different sources, depending on its
 
 * I'm not happy with having all of the 'test steps' defined in the test class, as I would like to have them somewhere reusable for other tests. I'm not sure of the patterns for this in TestNG, but I would add some feature level test step classes that instantiate the Page Objects and group together the methods called on them to carry out some actions.
 * The divide between methods in BasePage and BrowserDriver class is not as precise as it should be - takeScreenshot, for example.
-* Logging
+* Logging!
 * Timeouts - with a very fast wired net connection, I had some test runs fail as elements were hidden behind an ajax loader. Maybe each page should have a waitForElement method called on them before testing starts on it
