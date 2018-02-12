@@ -15,13 +15,17 @@ public class BrowserDriver {
 
     public synchronized static WebDriver getCurrentDriver() {
         if (driver ==null) {
-            System.out.println("Getting app config..." + System.getProperty("appConfig"));
-            System.setProperty("webdriver.gecko.driver",System.getProperty("env.geckodriver"));
             try {
+                System.setProperty("webdriver.gecko.driver",System.getProperty("env.geckodriver"));
                 driver = new FirefoxDriver();
                 driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
                 driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-            } finally{
+
+            } catch(Exception e) {
+                LOGGER.severe
+                        ("WebDriver not started - have you installed geckodriver and set the path to it in env.geckodriver system property?");
+                System.exit(0);
+            }finally{
                 Runtime.getRuntime().addShutdownHook(
                         new Thread(new BrowserCleanup()));
             }

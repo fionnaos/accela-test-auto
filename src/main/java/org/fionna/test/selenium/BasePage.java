@@ -6,13 +6,11 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Properties;
 import java.util.function.Function;
 import java.util.logging.Logger;
 
@@ -21,9 +19,7 @@ import static org.fionna.test.selenium.BrowserDriver.getCurrentDriver;
 
 public class BasePage {
 
-    private static final Logger LOGGER = Logger.getLogger(BrowserDriver.class.getName());
     protected WebDriver driver;
-
 
     public String getPageTitle() {
         return driver.getTitle();
@@ -50,33 +46,22 @@ public class BasePage {
                 ExpectedConditions.attributeToBeNotEmpty(elementToWaitFor, attribute));
     }
 
-    public static WebElement getParent(WebElement element) {
-        return element.findElement(By.xpath(".."));
-    }
-
-    public static List<WebElement> getDropDownOptions(WebElement webElement) {
-        Select select = new Select(webElement);
-        return select.getOptions();
-    }
-
-    public static WebElement getDropDownOption(WebElement webElement, String value) {
-        WebElement option = null;
-        List<WebElement> options = getDropDownOptions(webElement);
-        for (WebElement element : options) {
-            if (element.getAttribute("value").equalsIgnoreCase(value)) {
-                option = element;
-                break;
-            }
-        }
-        return option;
-    }
-
     public void takeScreenshot(String date) {
         File scrFile = ((TakesScreenshot)getCurrentDriver()).getScreenshotAs(OutputType.FILE);
+        String pathName = System.getProperty("env.screenshot");
+        File fileAtPath = new File(pathName);
+        String fileName = pathName + "/shot_" + date + ".png";
 
+        if (!Files.exists(fileAtPath.toPath())) {
+            try {
+                Files.createDirectories(fileAtPath.toPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             Files.copy(scrFile.toPath(),
-                    new File(System.getProperty("env.screenshots") + "/shot_" + date + ".png").toPath(),
+                    new File(fileName).toPath(),
                     (CopyOption) REPLACE_EXISTING);
         } catch (IOException e) {
             e.printStackTrace();
